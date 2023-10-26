@@ -24,7 +24,8 @@ private val API_LIST = arrayOf(
     Routing::energy,
     Routing::submit,
     Routing::requestToken,
-    Routing::register
+    Routing::register,
+    Routing::addedSign
 )
 
 fun main(args: Array<String>) {
@@ -35,18 +36,17 @@ fun main(args: Array<String>) {
         if (!baseDir.exists() ||
             !baseDir.isDirectory ||
             !baseDir.resolve("libfekit.so").exists() ||
-            !baseDir.resolve("libQSec.so").exists() ||
             !baseDir.resolve("config.json").exists()
             || !baseDir.resolve("dtconfig.json").exists()
         ) {
             error("The base path is invalid, perhaps it is not a directory or something is missing inside.")
         } else {
-            Json {
-                ignoreUnknownKeys = true
-            }
+            val json = Json { ignoreUnknownKeys = true }
             FEBound.initAssertConfig(baseDir)
-            CONFIG = Json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
+            println("FEBond sum = ${FEBound.checkCurrent()}")
+            CONFIG = json.decodeFromString<QSignConfig>(baseDir.resolve("config.json").readText())
                 .apply { checkIllegal() }
+            println("Load Package = ${CONFIG.protocol}")
         }
     }
     CONFIG.server.also {
@@ -61,6 +61,7 @@ fun Application.init() {
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
     install(StatusPages) {

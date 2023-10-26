@@ -3,3 +3,7 @@
 /build/
 /build/classes/kotlin/main/
 /.idea
+
+/debug-sandbox/
+local.properties
+*.zip
